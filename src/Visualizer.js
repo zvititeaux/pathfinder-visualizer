@@ -5,7 +5,9 @@ import PriorityQueue from 'js-priority-queue';
 
 const gridSize = 20;
 
-const createEmptyGrid = () => Array(gridSize).fill(Array(gridSize).fill(0));
+const createEmptyGrid = () => {
+    return Array.from({length:gridSize}, () => Array(gridSize).fill(0));
+};
 
 const heuristic = (a,b) => {
     return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
@@ -95,23 +97,27 @@ const Visualizer = () => {
         return path;
     }
     
-    
     // A simple pathfinding algorithm just to illustrate
 
     const runAlgorithm = () => {
         if (!start || !end) return;
         
-        //const cameFrom = aStarSearch(grid, start, end);
-        const path = aStarSearch(grid, start, end);
-
-        // Update the grid to show the path
-        const newGrid = [...grid];
-        path.forEach(node => {
-            newGrid[node.row][node.col] = 3; // Assigning value 3 to represent path nodes (just as an example)
-        });
+        const cameFrom = aStarSearch(grid, start, end);
+        const path = reconstructPath(cameFrom, start, end);
+        
+        if (path.length > 2) {
+            const newGrid = [...grid];
+            path.forEach(node => {
+                if ((node.row !== start.row || node.col !== start.col)
+                && (node.row !== end.row || node.col !== end.col)) {
+            newGrid[node.row][node.col] = 3;
+                }
+            });
         setGrid(newGrid);
-    };
-
+    } else {
+        console.error("Couldn't find a valid path between start and end points.");
+    }
+};
     const handleSavePath = async () => {
         const cameFrom = aStarSearch(grid, start, end);
         const path = reconstructPath(cameFrom, start, end);
@@ -151,6 +157,5 @@ const Visualizer = () => {
         </div>
     </div>
     );
-};
-
+}
 export default Visualizer;
