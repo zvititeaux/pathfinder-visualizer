@@ -130,6 +130,12 @@ const Visualizer = () => {
         }
     };
 
+    const resetGrid = () => {
+        setGrid(createEmptyGrid)();
+        setStart(null);
+        setEnd(null);
+    };
+
     return (
         <div>
             <select value={selectedAlgorithm} onChange={(e) => setSelectedAlgorithm(e.target.value)}>
@@ -138,6 +144,8 @@ const Visualizer = () => {
             </select>
             <button onClick={runAlgorithm}>Run Algorithm</button>
             <button onClick={handleSavePath}>Save Path</button>
+            <button onClick={resetGrid}>Reset Grid</button>
+
         
         <div style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 20px)`}}>
             {grid.map((row, rowIndex) =>
