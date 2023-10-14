@@ -131,7 +131,7 @@ const Visualizer = () => {
     };
 
     const resetGrid = () => {
-        setGrid(createEmptyGrid)();
+        setGrid(createEmptyGrid());
         setStart(null);
         setEnd(null);
     };
