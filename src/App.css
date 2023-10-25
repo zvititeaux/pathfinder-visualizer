@@ -6,6 +6,7 @@ body {
   color: #333;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 
@@ -21,22 +22,25 @@ body {
 
 .App-header {
   width: 100%;
-  background-color: #333;
+  background-color: #4A90E2;
   padding: 10px 0;
   color: #f4f5f7;
   margin-bottom: 2rem;
   border-radius: 10px;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
 select, button {
   margin: 0.5rem;
   padding: 0.5rem 1rem;
-  border: none;
+  border: 1px solid #0077cc;
   border-radius: 5px;
   background-color: #0077cc;
   color: white;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2;
 }
 
 select:focus, button:focus {
@@ -46,24 +50,34 @@ select:focus, button:focus {
 
 button:hover {
   background-color: #005fa3;
+  transform: translateY(-2px);
 }
 
 div[style*="grid"] {
   margin-top: 2rem;
+  border: 2px solid #e0e0e0;
+  overflow: hidden;
+  border-radius: 5px;
 }
 
 div[style*="20px"] {
   transition: background-color 0.3s, transform 0.3s;
+  border: 1px solid #ddd;
 }
 
 div[style*="20px"]:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 1;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 footer {
   margin-top: 2rem;
   padding: 1rem;
   text-align: center;
+  background-color: #333;
+  color: #f4f5f7;
+  font-size: 1rem;
+  border-radius: 5px;
 }
 

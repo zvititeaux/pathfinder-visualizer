@@ -5,6 +5,7 @@ import PriorityQueue from 'js-priority-queue';
 
 const gridSize = 20;
 
+
 const createEmptyGrid = () => {
     return Array.from({length:gridSize}, () => Array(gridSize).fill(0));
 };
@@ -64,11 +65,41 @@ const aStarSearch = (grid, start, goal) => {
     return cameFrom;
 };
 
+const dijkstraSearch = (grid, start, goal) => {
+    const frontier = new PriorityQueue({ comparator: (a, b) => a.priority - b.priority });
+    frontier.queue({ node: start, priority: 0 });
+    const cameFrom = {};
+    const costSoFar = {};
+    cameFrom[`$start-row-${start.col}`] = null;
+    costSoFar[`${start.row}-${start.col}`] = 0;
+
+    while (frontier.length) {
+        const current = frontier.dequeue().node;
+
+        if (current.row === goal.row && current.col === goal.col) {
+            break;
+        }
+    
+        getNeighbors(grid, current).forEach(next => {
+            const newCost = costSoFar[`${current.row}-${current.col}`] + 1;
+            if (!costSoFar[`${next.row}-${next.col}`] || newCost < costSoFar[`${next.row}-${next.col}`]) {
+                 costSoFar[`${next.row}-${next.col}`] = newCost; 
+                 frontier.queue({node: next, priority: newCost });
+                 cameFrom[`${next.row}-${next.col}`] = current; 
+            }
+        });
+    }
+
+    return cameFrom;
+}
+
 const Visualizer = () => {
     const [grid, setGrid] = useState(createEmptyGrid());
     const [start, setStart] = useState(null);
     const [end, setEnd] = useState(null);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState('AStar');
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCellClick = (row, col) => {
         if (!start) {
@@ -102,7 +133,14 @@ const Visualizer = () => {
     const runAlgorithm = () => {
         if (!start || !end) return;
         
-        const cameFrom = aStarSearch(grid, start, end);
+        let cameFrom;
+        if (selectedAlgorithm === `AStar`) {
+            cameFrom = aStarSearch(grid, start, end);
+        } else if (selectedAlgorithm === 'Dijkstra') {
+            cameFrom = dijkstraSearch(grid, start, end);
+        }
+
+       
         const path = reconstructPath(cameFrom, start, end);
         
         if (path.length > 2) {
@@ -119,14 +157,26 @@ const Visualizer = () => {
     }
 };
     const handleSavePath = async () => {
+        setIsLoading(true);
         const cameFrom = aStarSearch(grid, start, end);
         const path = reconstructPath(cameFrom, start, end);
 
+        const pathData = {
+            Grid: grid,
+            Start: start,
+            End: end,
+            Algorithm: selectedAlgorithm
+        };
+
         try {
-            const response = await axios.post('http://localhost:5000/api/path', { path });
+            const response = await axios.post('http://localhost:5000/api/path/savepath', pathData);
             console.log(response.data);
+            alert("Path saved successfully!");
         } catch (error) {
             console.error("Error saving path:", error);
+            alert("Error saving path. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -141,13 +191,14 @@ const Visualizer = () => {
             <select value={selectedAlgorithm} onChange={(e) => setSelectedAlgorithm(e.target.value)}>
                 <option value="AStar">A*</option>
                 {/*Adding more algorithms as options here */}
+                <option value="Dijkstra">Dijkstra</option>
             </select>
             <button onClick={runAlgorithm}>Run Algorithm</button>
             <button onClick={handleSavePath}>Save Path</button>
             <button onClick={resetGrid}>Reset Grid</button>
 
-        
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 20px)`}}>
+    <div style ={{ width: (20 * gridSize + gridSize - 1) + 'px', height: (20 * gridSize + gridSize -1) + 'px', backgroundColor: 'black'}}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${gridSize}, 20px)`, gridGap: '1px'}}>
             {grid.map((row, rowIndex) =>
                 row.map((cell, colIndex) => (
                     <div
@@ -156,7 +207,6 @@ const Visualizer = () => {
                         style={{
                             width: 20,
                             height: 20,
-                            border: '1px solid black',
                             backgroundColor: cell === 0 ? 'white' : cell === 1 ? 'blue' : cell === 2 ? 'red' : 'green'
                         }}
                     />
@@ -164,6 +214,8 @@ const Visualizer = () => {
             )}
         </div>
     </div>
-    );
+</div>
+);
 }
-export default Visualizer;
+
+export default Visualizer; 
